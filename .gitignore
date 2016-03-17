@@ -15,3 +15,14 @@ project/plugins/project/
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+
+# Java zxw
+dependency-reduced-pom.xml
+RemoteSystemsTempFiles
+.worksheet
+.metadata
+.settings
+.project
+.classpath
+.cache-main
+bin
