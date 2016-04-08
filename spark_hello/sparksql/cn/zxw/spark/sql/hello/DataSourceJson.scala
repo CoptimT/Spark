@@ -10,9 +10,9 @@ object DataSourceJson {
     
     // A JSON dataset is pointed to by path.
     // The path can be either a single text file or a directory storing text files.
-    val path = "file/people.json"
-    val people = sqlContext.read.json(path) // File / Path / RDD[String]
+    val people = sqlContext.read.json("file/people.json") // File / Path / RDD[String]
     people.printSchema()
+    people.show()
     // root
     //  |-- age: integer (nullable = true)
     //  |-- name: string (nullable = true)
@@ -27,5 +27,7 @@ object DataSourceJson {
     val df1 = sqlContext.sql("SELECT name,address.city FROM people")
     val df2 = sqlContext.sql("SELECT name,address.state FROM people")
     df.show()
+    df1.show()
+    df2.show()
   }
 }

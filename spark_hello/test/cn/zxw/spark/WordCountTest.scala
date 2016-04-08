@@ -12,7 +12,7 @@ object WordCountTest {
   }
   def test(){
     var sc = new SparkContext("local", "test")
-    var rdd = sc.textFile("C:\\zhangxw\\workSpace\\Spark\\spark_hello\\bin\\my\\wordcount.txt", 1)
+    var rdd = sc.textFile("file\\my\\wordcount.txt", 1)
     var words = rdd.flatMap{line => line.split("\\s+")}.map(word => (word,1)).reduceByKey(_+_)
     println(words.toDebugString)
     println("-----------------")
