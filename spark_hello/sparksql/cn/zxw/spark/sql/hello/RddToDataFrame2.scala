@@ -29,5 +29,7 @@ object RddToDataFrame2 {
     // The columns of a row in the result can be accessed by field index or by field name.
     results.map(t => "Name: " + t(0)).collect().foreach(println)
     peopleDataFrame.printSchema()
+    
+    sc.stop()
   }
 }

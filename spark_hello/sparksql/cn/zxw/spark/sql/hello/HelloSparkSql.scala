@@ -7,7 +7,6 @@ object HelloSparkSql {
   def main(args: Array[String]): Unit = {
     val sc = new SparkContext("local","HelloSparkSql")
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-    
     // this is used to implicitly convert an RDD to a DataFrame.
     import sqlContext.implicits._
     
@@ -32,6 +31,7 @@ object HelloSparkSql {
     val df1 = sqlContext.sql("SELECT * FROM people")
     df1.show()
     
+    sc.stop()
   }
   
 }

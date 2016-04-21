@@ -29,5 +29,7 @@ object DataSourceJson {
     df.show()
     df1.show()
     df2.show()
+    
+    sc.stop()
   }
 }
