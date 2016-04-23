@@ -25,4 +25,5 @@ RemoteSystemsTempFiles
 .project
 .classpath
 .cache-main
+.cache-tests
 bin
