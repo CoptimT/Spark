@@ -2,9 +2,6 @@ package cn.zxw.spark
 
 import org.apache.spark.SparkContext
 
-/**
- * @author zhangxw
- */
 object WordCountTest {
   
   def main(args: Array[String]): Unit = {
@@ -18,7 +15,6 @@ object WordCountTest {
     println("-----------------")
     words.foreach(f => println(f._1+" = "+f._2))
     sc.stop()
-    
   }
   
 }

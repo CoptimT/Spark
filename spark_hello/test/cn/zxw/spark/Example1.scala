@@ -2,9 +2,6 @@ package cn.zxw.spark
 
 import java.util.Random
 
-/**
- * @author zhangxw
- */
 object Example1 {
   def main(args: Array[String]): Unit = {
     val ranGen = new Random

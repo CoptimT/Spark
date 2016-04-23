@@ -6,14 +6,15 @@ import org.apache.spark.HashPartitioner
 import scala.collection.mutable.ArrayBuffer
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+import org.apache.spark.examples.streaming.StreamingExamples
 
 object TestApi {
-  val path = "C:\\zhangxw\\workSpace\\Spark\\spark_hello\\file\\"
+  val path = "file/"
   val sc = new SparkContext("local","TestApi")
-  //val logger = Logger.getLogger(TestApi.getClass)
-  
   def main(args: Array[String]): Unit = {
+    //val logger = Logger.getLogger(TestApi.getClass)
     //logger.setLevel(Level.ERROR)
+    StreamingExamples.setStreamingLogLevels()
     //testWC()
     //testAPI_1
     //testAPI_2
@@ -52,7 +53,7 @@ object TestApi {
     //combineByKey
     foldLeft
     
-    //sc.stop()
+    sc.stop()
   }
   def foldLeft(){
     var seq = Seq[Int](1,2,3,4)
