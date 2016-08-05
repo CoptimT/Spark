@@ -2,9 +2,6 @@ package cn.zxw.spark.sql.hello
 
 import org.apache.spark.SparkContext
 
-/**
- * error
- */
 object SchemaMerging {
   def main(args: Array[String]): Unit = {
     val sc = new SparkContext("local","SchemaMerging")
@@ -12,14 +9,15 @@ object SchemaMerging {
     import sqlContext.implicits._
     
     // Create a simple DataFrame, stored into a partition directory
-    val df1 = sc.makeRDD(1 to 5).map(i => (i, i * 2)).toDF("single", "double")
+    val df1 = sc.makeRDD(1 to 3).map(i => (i, i * 2)).toDF("single", "double")
     df1.write.parquet("file/test_table/key=1")
     // Create another DataFrame in a new partition directory,
     // adding a new column and dropping an existing column
-    val df2 = sc.makeRDD(6 to 10).map(i => (i, i * 3)).toDF("single", "triple")
+    val df2 = sc.makeRDD(3 to 5).map(i => (i, i * 3)).toDF("single", "triple")
     df2.write.parquet("file/test_table/key=2")
     // Read the partitioned table
-    val df3 = sqlContext.read.parquet("data/test_table")
+    //val df3 = sqlContext.read.parquet("data/test_table") //need config mergeSchema
+    val df3 = sqlContext.read.option("mergeSchema", "true").parquet("hdfs://10.10.25.14:8020/test/spark/tb_merge/")
     df3.printSchema()
     // The final schema consists of all 3 columns in the Parquet files together
     // with the partitioning column appeared in the partition directory paths.
