@@ -11,5 +11,11 @@ object HiveOnSpark {
     sqlContext.sql("LOAD DATA LOCAL INPATH 'file/kv1.txt' INTO TABLE src")
     // Queries are expressed in HiveQL
     sqlContext.sql("FROM src SELECT key, value").collect().foreach(println)
+    
+    val tableName = "test"
+    val df = sqlContext.table(tableName)
+    df.saveAsTable(tableName)
+    
+    sc.stop()
   }
 }
