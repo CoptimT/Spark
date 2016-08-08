@@ -5,7 +5,6 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.Seconds
 import org.apache.spark.storage.StorageLevel
 
-
 /**
  * @author zhangxw
  */
@@ -13,7 +12,7 @@ object StatefulWordCount {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setMaster("local[2]").setAppName("StatefulWordCount")
     val ssc = new StreamingContext(sparkConf,Seconds(5))
-    ssc.checkpoint("C:\\zhangxw\\workSpace\\Spark\\spark_hello\\file\\checkpoint\\")
+    ssc.checkpoint("D:\\GitHub\\Spark\\spark_hello\\file\\checkpoint\\")
     
     //MySocketServer
     val lines = ssc.socketTextStream("localhost", 9999, StorageLevel.MEMORY_ONLY_SER_2)

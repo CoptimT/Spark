@@ -10,7 +10,7 @@ import org.apache.spark.storage.StorageLevel
  */
 object WindowWordCount {
   def main(args: Array[String]): Unit = {
-    val sparkConf = new SparkConf().setMaster("local[2]").setAppName("StatefulWordCount")
+    val sparkConf = new SparkConf().setMaster("local[2]").setAppName("WindowWordCount")
     val ssc = new StreamingContext(sparkConf,Seconds(5))
     
     //MySocketServer

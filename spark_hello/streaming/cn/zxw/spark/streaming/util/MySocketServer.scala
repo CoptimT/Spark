@@ -5,12 +5,10 @@ import scala.io.Source
 import java.net.ServerSocket
 import java.io.PrintWriter
 
-
 /**
  * @author zhangxw
  */
 object MySocketServer {
-  
   def main(args: Array[String]): Unit = {
     if(args.length != 3){
       System.err.println("Usage: <filename> <port> <millisecond>")
@@ -25,12 +23,13 @@ object MySocketServer {
     
     val server = new ServerSocket(port)
     while(true){
+      println("Server waiting for client connect...")
       val client = server.accept()
       new Thread(){
         override def run(){
           println("Get client connected from : " + client.getInetAddress)
           val out = new PrintWriter(client.getOutputStream,true)
-          while(true){
+          while(client.isConnected()){
             Thread.sleep(millis)
             val content = lines(index(rows))
             println(">>> " + content)
@@ -39,9 +38,12 @@ object MySocketServer {
           }
           out.close()
           client.close()
+          println("Client connect close!")
         }
       }.start()
     }
+    server.close()
+    println("Server close!")
   }
   
   def index(length:Int):Int={
