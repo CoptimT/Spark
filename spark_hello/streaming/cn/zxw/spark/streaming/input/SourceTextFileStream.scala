@@ -12,7 +12,7 @@ object SourceTextFileStream {
     val sparkConf = new SparkConf().setMaster("local[2]").setAppName("SourceTextFileStream")
     val ssc = new StreamingContext(sparkConf,Seconds(5))
     
-    val lines = ssc.textFileStream("file:///Users/zhangxw/Desktop/log/temp/")
+    val lines = ssc.textFileStream("file:///D:/GitHub/Spark/spark_hello/file/my/")
     
     val words = lines.flatMap { x => x.split("\\s") }
     val pairs = words.map { x => (x,1) }
