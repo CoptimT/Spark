@@ -57,10 +57,10 @@ object TestApi {
   }
   def foldLeft(){
     var seq = Seq[Int](1,2,3,4)
-    //val res = seq.foldLeft[Int](1)((a,b) => a+b)
-    //val res = seq.foldRight[Int](1)((a,b) => a+b)
-    val res = seq.fold[Int](1)((a,b) => a+b)
-    println(res)
+    val res1 = seq.foldLeft[Int](1)((a,b) => a+b)
+    val res2 = seq.foldRight[Int](1)((a,b) => a+b)
+    val res3 = seq.fold[Int](1)((a,b) => a+b)
+    println(res1+","+res2+","+res3)//11,11,11
   }
   def saveAsNewAPIHadoopFile(){
     var rdd = sc.makeRDD(Array(("A",1)))
