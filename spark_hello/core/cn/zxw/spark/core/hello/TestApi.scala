@@ -12,13 +12,12 @@ object TestApi {
   val path = "file/"
   val sc = new SparkContext("local","TestApi")
   def main(args: Array[String]): Unit = {
-    //val logger = Logger.getLogger(TestApi.getClass)
-    //logger.setLevel(Level.ERROR)
-    StreamingExamples.setStreamingLogLevels()
+    Logger.getLogger("org.apache.spark").setLevel(Level.OFF)//Level.WARN
+    Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.OFF)
     //testWC()
     //testAPI_1
     //testAPI_2
-    //testAPI_3
+    join
     //testAPI_4
     //testAPI_5
     //leftOuterJoin
@@ -51,7 +50,7 @@ object TestApi {
     //mapValues
     //flatMapValues
     //combineByKey
-    foldLeft
+    //foldLeft
     
     sc.stop()
   }
@@ -349,11 +348,19 @@ object TestApi {
   /**
    * join
    */
-  def testAPI_3(){
+  def join(){
     val rdd1 = sc.parallelize(List(('a',1),('b',1),('a',2),('b',2),('c',11)), 1)
     val rdd2 = sc.parallelize(List(('a',3),('b',3),('a',4),('b',4),('d',12)), 1)
     val rdd = rdd1.join(rdd2)
     rdd.collect().foreach(f => println(f._1+" = "+f._2))
+    /*a = (1,3)
+    a = (1,4)
+    a = (2,3)
+    a = (2,4)
+    b = (1,3)
+    b = (1,4)
+    b = (2,3)
+    b = (2,4)*/
   }
   /**
    * fullOuterJoin
