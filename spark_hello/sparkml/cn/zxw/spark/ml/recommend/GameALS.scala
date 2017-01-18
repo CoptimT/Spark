@@ -235,7 +235,7 @@ object GameALS {
       collection.updateOne(oba, obc, options)
     }
   }
-
+  
   /**
    * 计算余铉相似度
    * @param vec1
