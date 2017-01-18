@@ -181,7 +181,7 @@ object GameALS {
       collection.updateOne(oba, obc, options)
     }
   }
-
+ 
   /**
    * 为每个用户推荐GAMELENGTH款游戏
    * @param bestModel
