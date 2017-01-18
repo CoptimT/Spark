@@ -245,5 +245,4 @@ object GameALS {
   def cosineSimilarity(vec1: DoubleMatrix, vec2: DoubleMatrix): Double = {
     vec1.dot(vec2) / (vec1.norm2() * vec2.norm2())
   }
-
 }
