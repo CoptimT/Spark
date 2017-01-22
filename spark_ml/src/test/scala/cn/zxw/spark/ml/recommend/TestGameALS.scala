@@ -11,7 +11,6 @@ import org.jblas.DoubleMatrix
 
 import scala.collection.mutable.ArrayBuffer
 
-
 /**
  * Created by hadoop on 2015/11/2.
  */
