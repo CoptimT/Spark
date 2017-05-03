@@ -21,7 +21,6 @@ object ClickStreaming {
     * groupId = args(2)        设置kafka的消费者组id
     * interval = args(3).toInt 设置spreaming的处理间隔，以秒为单位
     */
-
   def main(args: Array[String]): Unit = {
     if (args.length != 4) {
       System.err.println("Params not enough!!!" + args)
@@ -129,7 +128,6 @@ object ClickStreaming {
             println(s"Error updating the offset to Kafka cluster: ${o.left.get}")
           }
         }
-
       }
 
     ssc.start()
