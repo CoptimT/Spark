@@ -44,16 +44,18 @@ object DirectKafkaWordCount extends Logging{
       "metadata.broker.list" -> brokers,
       "serializer.class" -> "kafka.serializer.StringEncoder"
     )
-    /*
+
     val fromOffsets = getFromOffsets(zkQuorum,topic,group,partitions.toInt)
 
-    val dstream: DStream[(String, Array[Byte])] = fromOffsets.map { fo =>
+    val dstream: DStream[(String, Array[Byte])] = fromOffsets.map { fromOffset =>
       val messageHandler: MessageAndMetadata[String, Array[Byte]] => (String, Array[Byte]) = (mmd: MessageAndMetadata[String, Array[Byte]]) => (mmd.key, mmd.message)
-      KafkaUtils.createDirectStream[String, Array[Byte], StringDecoder, DefaultDecoder, Tuple2[String, Array[Byte]]](ssc, kafkaParams, fo, messageHandler)
-    } getOrElse KafkaUtils.createDirectStream[String, Array[Byte], StringDecoder, DefaultDecoder](ssc = ssc, kafkaParams = kafkaParams, topics = topicsSet)
-    */
+      KafkaUtils.createDirectStream[String, Array[Byte], StringDecoder, DefaultDecoder, Tuple2[String, Array[Byte]]](ssc, kafkaParams, fromOffset, messageHandler)
+    }.getOrElse{
+      KafkaUtils.createDirectStream[String, Array[Byte], StringDecoder, DefaultDecoder](ssc, kafkaParams, topicsSet)
+    }
 
-    val dstream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, topicsSet)
+
+    //val dstream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, topicsSet)
     dstream.foreachRDDWithOffsets(zkQuorum,group,topic){ rdd =>
       val wc = rdd.map(_._2).flatMap(_.split("\\s")).map(x => (x, 1L)).reduceByKey(_ + _)
       wc.collect().foreach(t => println(t._1 + ": " + t._2))
@@ -61,6 +63,44 @@ object DirectKafkaWordCount extends Logging{
     
     ssc.start()
     ssc.awaitTermination()
+  }
+
+  def getFromOffsets(zkQuorum: String, topic: String, group: String, partitions: Int): Option[Map[TopicAndPartition, Long]] = {
+    val zkClient: ZooKeeper = new ZooKeeper(zkQuorum, 3000, new Watcher {
+      override def process(event: WatchedEvent): Unit = {}
+    })
+    val list = (0 until partitions).toList.flatMap { i =>
+      val nodePath = s"/consumers/$group/offsets/$topic/$i"
+      try {
+        zkClient.exists(nodePath,false) match {
+          case stat:Stat =>
+            val maybeOffset = Option(new String(zkClient.getData(nodePath,false,null)))
+            logInfo(s"Kafka Direct Stream - From Offset - ZK Node ($nodePath) - Value: $maybeOffset")
+            maybeOffset.map { offset =>
+              TopicAndPartition(topic, i) -> offset.toLong
+            }
+          case _ =>
+            logInfo(s"Kafka Direct Stream - From Offset - ZK Node ($nodePath) does NOT exist")
+            None
+        }
+      } catch {
+        case NonFatal(error) =>
+          logError(s"Kafka Direct Stream - From Offset - ZK Node ($nodePath) - Error: $error")
+          None
+      }
+    }
+
+    (list.size == partitions) match {
+      case true =>
+        list.foreach {
+          case (t, offset) =>
+            logInfo(s"From Offset - Topic: ${t.topic}, Partition: ${t.partition}, Offset: ${offset}")
+        }
+        Some(list.toMap)
+      case false =>
+        logInfo(s"Current ZK offsets (${list.size} doesn't match partition size, so gonna rely on Spark checkpoint to reuse Kafka offsets")
+        None
+    }
   }
 
   implicit class PimpDStream[T: ClassTag](dstream: DStream[T]) extends Serializable {
