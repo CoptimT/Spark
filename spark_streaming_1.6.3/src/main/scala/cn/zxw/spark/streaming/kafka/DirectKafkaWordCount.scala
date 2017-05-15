@@ -47,13 +47,25 @@ object DirectKafkaWordCount extends Logging{
 
     val fromOffsets = getFromOffsets(zkQuorum,topic,group,partitions.toInt)
 
-    val dstream: DStream[(String, Array[Byte])] = fromOffsets.map { fromOffset =>
+    /*createDirectStream[K, V, KD <:kafka.serializer.Decoder[K], VD <:kafka.serializer.Decoder[V], R](
+     ssc: StreamingContext,
+     kafkaParams: Map[String, String],
+     fromOffsets: Map[TopicAndPartition, Long],
+     messageHandler: MessageAndMetadata[K, V] => R): InputDStream[R]*/
+
+    /*val dstream: DStream[(String, Array[Byte])] = fromOffsets.map { fromOffset =>
       val messageHandler: MessageAndMetadata[String, Array[Byte]] => (String, Array[Byte]) = (mmd: MessageAndMetadata[String, Array[Byte]]) => (mmd.key, mmd.message)
       KafkaUtils.createDirectStream[String, Array[Byte], StringDecoder, DefaultDecoder, Tuple2[String, Array[Byte]]](ssc, kafkaParams, fromOffset, messageHandler)
     }.getOrElse{
       KafkaUtils.createDirectStream[String, Array[Byte], StringDecoder, DefaultDecoder](ssc, kafkaParams, topicsSet)
+    }*/
+    val dstream: DStream[(String, String)] = fromOffsets.map { fromOffset =>
+      println(fromOffset)
+      val messageHandler: MessageAndMetadata[String, String] => (String, String) = (mmd: MessageAndMetadata[String, String]) => (mmd.key, mmd.message)
+      KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, Tuple2[String, String]](ssc, kafkaParams, fromOffset, messageHandler)
+    }.getOrElse{
+      KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, topicsSet)
     }
-
 
     //val dstream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, topicsSet)
     dstream.foreachRDDWithOffsets(zkQuorum,group,topic){ rdd =>
@@ -65,6 +77,9 @@ object DirectKafkaWordCount extends Logging{
     ssc.awaitTermination()
   }
 
+  //=================================================================================================================
+  //以下offsets存入zk代码根据样例改写:http://geeks.aretotally.in/spark-streaming-kafka-direct-api-store-offsets-in-zk/
+  //=================================================================================================================
   def getFromOffsets(zkQuorum: String, topic: String, group: String, partitions: Int): Option[Map[TopicAndPartition, Long]] = {
     val zkClient: ZooKeeper = new ZooKeeper(zkQuorum, 3000, new Watcher {
       override def process(event: WatchedEvent): Unit = {}
@@ -89,6 +104,7 @@ object DirectKafkaWordCount extends Logging{
           None
       }
     }
+    zkClient.close()
 
     (list.size == partitions) match {
       case true =>
@@ -149,6 +165,11 @@ object DirectKafkaWordCount extends Logging{
               zk.exists(nodePath,false) match {
                 case stat:Stat =>
                   logInfo(s"Kafka Direct Stream - Offset - ZK Node ($nodePath) exists, setting value: ${o.untilOffset}")
+                  /**
+                    * Set the data for the node of the given path if such a node exists and the
+                    * given version matches the version of the node (if the given version is
+                    * -1, it matches any node's versions). Return the stat of the node.
+                    */
                   zk.setData(nodePath, o.untilOffset.toString.getBytes,-1)
 
                 case _ =>
@@ -157,23 +178,23 @@ object DirectKafkaWordCount extends Logging{
               }
             }
 
-            /*val hostname = InetAddress.getLocalHost().getHostName()
+            val hostname = InetAddress.getLocalHost().getHostName()
             val ownerId = s"${group}-${hostname}-${o.partition}"
             val now = org.joda.time.DateTime.now.getMillis
 
             // Consumer Ids
             locally {
               val nodePath = s"/consumers/$group/ids/${ownerId}"
-              val value = s"""{"version":1,"subscription":{"${o.topic}":${o.partition},"pattern":"white_list","timestamp":"$now"}"""
+              val value = s"""{"version":1,"subscription":{"${o.topic}":${o.partition},"pattern":"white_list","timestamp":"$now"}}"""
 
-              zk.exists(nodePath) match {
-                case true =>
-                  logger info s"Kafka Direct Stream - Id - ZK Node ($nodePath) exists, setting value: ${value}"
-                  zk.setRaw(nodePath, value.getBytes)
+              zk.exists(nodePath,false) match {
+                case stat:Stat =>
+                  logInfo(s"Kafka Direct Stream - Id - ZK Node ($nodePath) exists, setting value: ${value}")
+                  zk.setData(nodePath, value.getBytes, -1)
 
-                case false =>
-                  logger info s"Kafka Direct Stream - Id - ZK Node ($nodePath) does NOT exist -- setting value: ${value}"
-                  zk.createRaw(nodePath, value.getBytes, createMode = Some(CreateMode.PERSISTENT))
+                case _ =>
+                  logInfo(s"Kafka Direct Stream - Id - ZK Node ($nodePath) does NOT exist -- setting value: ${value}")
+                  zk.create(nodePath, value.getBytes, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT)
               }
             }
 
@@ -182,24 +203,26 @@ object DirectKafkaWordCount extends Logging{
               val nodePath = s"/consumers/$group/owners/${o.topic}/${o.partition}"
               val value = ownerId
 
-              zk.exists(nodePath) match {
-                case true =>
-                  logger info s"Kafka Direct Stream - Owner - ZK Node ($nodePath) exists, setting value: ${value}"
-                  zk.setRaw(nodePath, value.getBytes)
+              zk.exists(nodePath,false) match {
+                case stat:Stat =>
+                  logInfo(s"Kafka Direct Stream - Owner - ZK Node ($nodePath) exists, setting value: ${value}")
+                  zk.setData(nodePath, value.getBytes, -1)
 
-                case false =>
-                  logger info s"Kafka Direct Stream - Owner - ZK Node ($nodePath) does NOT exist -- setting value: ${value}"
-                  zk.createRaw(nodePath, value.getBytes, createMode = Some(CreateMode.PERSISTENT))
+                case _ =>
+                  logInfo(s"Kafka Direct Stream - Owner - ZK Node ($nodePath) does NOT exist -- setting value: ${value}")
+                  zk.create(nodePath, value.getBytes, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT)
               }
-            }*/
+            }
           }
-
         case _ =>
           logError(s"DStream - ZK Offsets - Cannot store on ZK since RDD is not of type of HasOffsetRanges: $rdd")
       }
     }
   }
 
+  //=================================================================================================================
+  //以下offsets存入zookeeper样例摘录自:http://geeks.aretotally.in/spark-streaming-kafka-direct-api-store-offsets-in-zk/
+  //=================================================================================================================
   /*
   def getFromOffsets(zk: String, topic: String, group: String, partitions: Int)(implicit logger: org.log4s.Logger): Option[Map[TopicAndPartition, Long]] = {
     val zkClient = new ZkClientImpl(zk, java.util.UUID.randomUUID.toString)
