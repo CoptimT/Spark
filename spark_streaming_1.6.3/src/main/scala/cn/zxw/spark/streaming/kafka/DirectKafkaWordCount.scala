@@ -41,6 +41,7 @@ object DirectKafkaWordCount extends Logging{
     // Create direct kafka stream with brokers and topics
     val topicsSet = Set(topic)
     val kafkaParams = Map[String, String](
+      "group.id" -> group,
       "metadata.broker.list" -> brokers,
       "serializer.class" -> "kafka.serializer.StringEncoder"
     )
@@ -149,6 +150,7 @@ object DirectKafkaWordCount extends Logging{
     }
   }
 
+  //问题：zk不能创建一次创建多级目录
   implicit class PimpRDD[T: ClassTag](rdd: RDD[T]) {
 
     def zkOffsets(group: String)(implicit zk: ZooKeeper): Unit = {
