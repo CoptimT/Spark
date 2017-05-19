@@ -13,27 +13,29 @@ object DataSourceJdbc {
 
     val driver = "com.mysql.jdbc.Driver"
     val url = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8"
+    val username = "root"
+    val password = "123456"
     val table = "tb_user"
-
-    val jdbcDF = sqlContext.load("jdbc", Map(
-                "driver" -> driver,
-                "url" -> url,
-                "dbtable" -> table,
-                "user" -> "root",
-                "password" -> "123456"))
-
+    val map = Map(
+      "driver" -> driver,
+      "url" -> url,
+      "dbtable" -> table,
+      "user" -> username,
+      "password" -> password)
     val properties = new Properties()
     properties.setProperty("driver", driver)
-    properties.setProperty("user", "root")
-    properties.setProperty("password","123456")
-    //val jdbcDF = sqlContext.read.jdbc(url, table, properties)
+    properties.setProperty("user", username)
+    properties.setProperty("password",password)
 
+    //val jdbcDF = sqlContext.load("jdbc", map)
+    //val jdbcDF = sqlContext.read.jdbc(url, table, properties)
+    val jdbcDF = sqlContext.read.format("jdbc").options(map).load()
     jdbcDF.show()
+
     //Exception in thread "main" java.lang.RuntimeException: Table tb_user already exists.
     //jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")).write.jdbc(url, table, properties)
     //success
-    jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")).write.mode(SaveMode.Append).jdbc(url, table, properties)
-
+    //jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")).write.mode(SaveMode.Append).jdbc(url, table, properties)
     //Exception in thread "main" org.apache.spark.sql.AnalysisException: Table not found: tb_user;
     //jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")).write.insertInto(table)
 
