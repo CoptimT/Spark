@@ -30,11 +30,12 @@ object DataSourceJdbc {
 
     jdbcDF.show()
     //Exception in thread "main" java.lang.RuntimeException: Table tb_user already exists.
-    //jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")+1).write.jdbc(url, table, properties)
-    //Exception in thread "main" org.apache.spark.sql.AnalysisException: Table not found: tb_user;
-    //jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")+1).write.insertInto(table)
+    //jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")).write.jdbc(url, table, properties)
+    //success
+    jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")).write.mode(SaveMode.Append).jdbc(url, table, properties)
 
-    jdbcDF.select(jdbcDF("username"),jdbcDF("password"),(jdbcDF("age")+1)).write.mode(SaveMode.Append).jdbc(url, table, properties)
+    //Exception in thread "main" org.apache.spark.sql.AnalysisException: Table not found: tb_user;
+    //jdbcDF.select(jdbcDF("username"),jdbcDF("password"),jdbcDF("age")).write.insertInto(table)
 
     sc.stop()
   }
