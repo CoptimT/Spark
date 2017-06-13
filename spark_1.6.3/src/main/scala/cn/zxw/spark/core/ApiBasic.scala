@@ -1,13 +1,10 @@
-package cn.zxw.spark.core.hello
+package cn.zxw.spark.core
 
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkConf
-import org.apache.hadoop.io.LongWritable
-import org.apache.hadoop.io.Text
-import org.apache.hadoop.mapred.JobConf
-import org.apache.hadoop.mapred.TextInputFormat
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.mapreduce.lib.input.{TextInputFormat=>NewTextInputFormat}
+import org.apache.hadoop.io.{LongWritable, Text}
+import org.apache.hadoop.mapred.{JobConf, TextInputFormat}
+import org.apache.hadoop.mapreduce.lib.input.{TextInputFormat => NewTextInputFormat}
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * @author lx
@@ -39,4 +36,5 @@ object ApiBasic {
     
     
   }
+
 }

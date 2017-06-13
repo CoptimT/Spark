@@ -1,7 +1,6 @@
-package cn.zxw.spark.core.hello
+package cn.zxw.spark.core
 
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 
 object WordCount {
   
