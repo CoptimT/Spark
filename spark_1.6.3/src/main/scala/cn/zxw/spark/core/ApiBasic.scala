@@ -10,10 +10,10 @@ import org.apache.spark.{SparkConf, SparkContext}
  * @author lx
  */
 object ApiBasic {
+  val conf = new SparkConf().setMaster("local[2]").setAppName("ApiBasic")
+  val sc = new SparkContext(conf)
   def main(args: Array[String]): Unit = {
-    val master = args(0)
-    val conf = new SparkConf().setMaster(master).setAppName("ApiBasic")
-    val sc = new SparkContext(conf)
+
     
     val tf1 = sc.textFile("/my/directory")
     val tf2 = sc.textFile("/my/directory/*.txt")
@@ -37,19 +37,19 @@ object ApiBasic {
   }
   //1. 文本文件(TextInputFormat)
   def textfile(): Unit ={
-    sc.textFile(“file.txt”) //将本地文本文件加载成RDD
-    sc.textFile(“directory/*.txt”) //将某类文本文件加载成RDD
-    sc.textFile(“hdfs://nn:9000/path/file”) //hdfs文件或目录
+    sc.textFile("file.txt") //将本地文本文件加载成RDD
+    sc.textFile("directory/*.txt") //将某类文本文件加载成RDD
+    sc.textFile("hdfs://nn:9000/path/file") //hdfs文件或目录
 
-    inputRdd = sc.textFile(“/data/input”)
-    inputRdd = sc.textFile(“file:///data/input”)
-    inputRdd = sc.textFile(“hdfs:///data/input”)
-    inputRdd = sc.textFile(“hdfs://namenode:8020/data/input”)
+    /*inputRdd = sc.textFile("/data/input")
+    inputRdd = sc.textFile("file:///data/input")
+    inputRdd = sc.textFile("hdfs:///data/input")
+    inputRdd = sc.textFile("hdfs://namenode:8020/data/input")*/
   }
 
   //2. sequenceFile文件(SequenceFileInputFormat)
   def sequenceFile(): Unit ={
-    val master = args(0)
+    /*val master = args(0)
     val conf = new SparkConf().setMaster(master).setAppName("ApiBasic")
     val sc = new SparkContext(conf)
 
@@ -58,7 +58,7 @@ object ApiBasic {
     sc.sequenceFile(“file.txt”) //将本地二进制文件加载成RDD
     sc.sequenceFile[String, Int] (“hdfs://nn:9000/path/file”)
 
-    nums.saveAsSequenceFile(“hdfs://nn:8020/output”)
+    nums.saveAsSequenceFile(“hdfs://nn:8020/output”)*/
   }
   //3. 使用任意自定义的Hadoop InputFormat
   //3.1 官方InputFormat
@@ -69,16 +69,16 @@ object ApiBasic {
   def myInputFormat(): Unit ={
     // NLineInputFormat将文本文件中的N行作为一个input split，由一个Map Task处理
     // 创建一个JobConf，并设置输入目录及其他属性
-    val jobConf = new JobConf(); FileInputFormat.setInputPaths(jobConf, inputPath)
+    /*val jobConf = new JobConf(); FileInputFormat.setInputPaths(jobConf, inputPath)
     // 使用NLineInputFormat, 为了与hadoop 1.0 和2.0都兼容，我们同时设置了两个属性 jobConf.setInt("mapred.line.input.format.linespermap", 100) jobConf.setInt("mapreduce.input.lineinputformat.linespermap", 100)
     // key的类型是LongWritable, value类型是Text
     val inputFormatClass = classOf[NLineInputFormat]
-    var hadoopRdd = sc.hadoopRDD(jobConf, inputFormatClass, classOf[LongWritable], classOf[Text])
+    var hadoopRdd = sc.hadoopRDD(jobConf, inputFormatClass, classOf[LongWritable], classOf[Text])*/
   }
 
   //3.3 HBase
   def hbaseFile(): Unit ={
-    //创建SparkContext
+    /*//创建SparkContext
     val sparkConf = new SparkConf val sc = new SparkContext(conf )
     // 设置hbase configuration
     val hbaseConf = HBaseConfiguration.create() hbaseConf.addResource(new Path(“hbase-site.xml")) hbaseConf.set(TableInputFormat.INPUT_TABLE, tableName)
@@ -99,7 +99,7 @@ object ApiBasic {
       def createHBaseRow(metricId : String, timestamp : Long, value : Int) = { val record = new Put(Bytes.toBytes(metricId + "~" + timestamp)) record.add(Bytes.toBytes("metric"), Bytes.toBytes("col"),
       Bytes.toBytes(value.toString))
       (new ImmutableBytesWritable, record)
-      }
+      }*/
   }
 
 }
