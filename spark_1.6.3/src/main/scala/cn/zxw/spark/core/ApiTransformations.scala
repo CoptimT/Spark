@@ -7,13 +7,16 @@ import org.apache.spark.{SparkConf, SparkContext}
  * @author lx
  */
 object ApiTransformations {
+  val conf = new SparkConf().setMaster("local[2]").setAppName("ApiTransformations")
+  val sc = new SparkContext(conf)
   def main(args: Array[String]): Unit = {
-    val master = args(0)
-    val conf = new SparkConf().setMaster(master).setAppName("ApiBasic")
-    val sc = new SparkContext(conf)
+
     
     
     
-    
+    sc.stop()
+  }
+  def testPipe(): Unit ={
+    rdd.pipe()
   }
 }
