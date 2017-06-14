@@ -6,7 +6,7 @@ import java.util.Date
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
 
-case class TdData(
+case class TdData (
      day:  Option[String],
      app:  Option[String],
      event_time: Option[String],
@@ -39,29 +39,37 @@ object TdChannelSpreadParser {
   }
 
   def splitLogRaw(line: String) = {
-    val arr = line.split("&")
-    val map = scala.collection.mutable.Map[String,String]()
-    arr.map(kv => {
-      val pairs = kv.split("=")
-      map.put(pairs(0).toLowerCase,pairs(1))
-    })
-    val day:Option[String] = getFormatDate(map.get("eventtime"))
-
-    //arr.map(println(_))
-    TdData(day,
-      map.get("app"),
-      map.get("eventtime"),
-      map.get("idfa"),
-      map.get("spreadname"),
-      map.get("ip"),
-      map.get("devicetype"),
-      map.get("appkey"),
-      map.get("clickip"),
-      map.get("clicktime"),
-      map.get("adnetname"),
-      map.get("tdid"),
-      map.get("ua")
-    )
+    //try{
+      val arr = line.split("&")
+      val map = scala.collection.mutable.Map[String,String]()
+      arr.map(kv => {
+        val pairs = kv.split("=")
+        if(pairs.length == 2 && !pairs(0).equalsIgnoreCase("UA")){
+          //println(kv)
+          //println(line)
+          map.put(pairs(0).toLowerCase,pairs(1))
+        }
+      })
+      val day:Option[String] = getFormatDate(map.get("eventtime"))
+      //arr.map(println(_))
+      TdData(day,
+        map.get("app"),
+        map.get("eventtime"),
+        map.get("idfa"),
+        map.get("spreadname"),
+        map.get("ip"),
+        map.get("devicetype"),
+        map.get("appkey"),
+        map.get("clickip"),
+        map.get("clicktime"),
+        map.get("adnetname"),
+        map.get("tdid"),
+        map.get("ua")
+      )
+    /*}catch{
+      case e:Exception => println(s"Error record: $line")
+        None
+    }*/
   }
 
 
@@ -72,8 +80,8 @@ object TdChannelSpreadParser {
     println("---------")
     splitLogRaw(data1)*/
 
-    val inputPath = "spark_1.6.3/src/main/resources/project/2017060110"
-    val outputPath = "spark_1.6.3/src/main/resources/temporary/td"
+    val inputPath = "spark_1.6.3/src/main/resources/project/2017061110"
+    val outputPath = "spark_1.6.3/src/main/resources/temporary"
     val part = 1
     val sc = new SparkContext("local[3]","td")
 
@@ -92,8 +100,8 @@ object TdChannelSpreadParser {
     //rdd.map(splitLogRaw(_)).toDF().write.parquet(outputPath: String)
     val df = rdd.map(splitLogRaw(_)).toDF()
     df.registerTempTable("td")
-    sqlContext.sql("select * from td limit 30").show()
-    //df.write.parquet(outputPath)
+    sqlContext.sql("select * from td").show()
+    //df.write.save(outputPath)
 
     sc.stop()
   }

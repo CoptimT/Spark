@@ -17,6 +17,6 @@ object ApiTransformations {
     sc.stop()
   }
   def testPipe(): Unit ={
-    rdd.pipe()
+    //rdd.pipe()
   }
 }

@@ -38,7 +38,7 @@ object SparkFeatures {
   def broadcast(): Unit ={
     val data = Set(1, 2, 4, 6) // 大小为128MB
     val bdata = sc.broadcast(data)
-    val rdd = sc.parallelize(1to 1000000, 100)
+    val rdd = sc.parallelize(1 to 1000000, 100)
     val observedSizes= rdd.map(_ => bdata.value.size )
   }
 
