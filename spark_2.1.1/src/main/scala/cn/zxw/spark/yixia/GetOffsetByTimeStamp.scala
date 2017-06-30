@@ -4,6 +4,11 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.Properties
 
+import kafka.client.ClientUtils
+import org.apache.kafka.clients.consumer.{KafkaConsumer, OffsetAndTimestamp}
+import org.apache.kafka.common.TopicPartition
+import org.apache.spark.sql.SparkSession
+
 object GetOffsetByTimeStamp {
 
   case class OffsetInfo2(topic: String, partition: Int, offsetBegin: Long, offsetEnd: Long)
@@ -52,7 +57,7 @@ object GetOffsetByTimeStamp {
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     val kafkaConsumer = new KafkaConsumer(props)
 
-    var offsetsMap: Map[Int, (Long, Long)] = immutable.Map[Int, (Long, Long)]()
+    var offsetsMap: Map[Int, (Long, Long)] = Map[Int, (Long, Long)]()
 
     /**
       * timestamp_begin
@@ -157,7 +162,7 @@ object GetOffsetByTimeStamp {
     })
 
     // write
-    val ds = list1.toDS()
-    ds.repartition(1).write.parquet(path)
+    //val ds = list1.toDS()
+    //ds.repartition(1).write.parquet(path)
   }
 }
