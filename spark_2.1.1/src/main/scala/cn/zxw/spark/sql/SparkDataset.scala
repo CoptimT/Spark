@@ -19,6 +19,7 @@ object SparkDataset {
     // Note: Case classes in Scala 2.10 can support only up to 22 fields. To work around this limit,
     // you can use custom classes that implement the Product interface
     case class Person(name: String, age: Long)
+/*
 
     // Encoders are created for case classes
     val caseClassDS = Seq(Person("Andy", 32)).toDS()
@@ -46,6 +47,7 @@ object SparkDataset {
     // +----+-------+
 
 
+*/
 
 
 

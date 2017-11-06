@@ -17,6 +17,7 @@ object RddToDF2 {
     // For implicit conversions like converting RDDs to DataFrames
     import spark.implicits._
     val path = "spark_2.1.1/src/main/resources/examples/"
+/*
 
     // Create an RDD
     val peopleRDD = spark.sparkContext.textFile(path + "people.txt")
@@ -53,5 +54,9 @@ object RddToDF2 {
     // |   Name: Andy|
     // | Name: Justin|
     // +-------------+
+
+*/
+
+
   }
 }

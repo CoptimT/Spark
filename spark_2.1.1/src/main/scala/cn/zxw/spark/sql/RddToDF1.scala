@@ -19,6 +19,7 @@ object RddToDF1 {
     // Note: Case classes in Scala 2.10 can support only up to 22 fields. To work around this limit,
     // you can use custom classes that implement the Product interface
     case class Person(name: String, age: Long)
+/*
 
     val path = "spark_2.1.1/src/main/resources/examples/"
     // Create an RDD of Person objects from a text file, convert it to a Dataframe
@@ -56,5 +57,9 @@ object RddToDF1 {
     // row.getValuesMap[T] retrieves multiple columns at once into a Map[String, T]
     teenagersDF.map(teenager => teenager.getValuesMap[Any](List("name", "age"))).collect()
     // Array(Map("name" -> "Justin", "age" -> 19))
+
+*/
+
+
   }
 }
